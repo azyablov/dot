@@ -82,7 +82,7 @@ func clientHandler(conn net.Conn) {
 			log.Println("Gacefully closing client connection\n", err)
 			return
 		}
-
+		// // TODO: add CA
 		// rootCAPEM := `<root CA cert in PEM>`
 
 		// rootCAs := x509.NewCertPool()
