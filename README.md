@@ -10,7 +10,8 @@ The key RFCs describing the sujbject matter are [RFC7858](https://datatracker.ie
 
 ### Ports
 
-Usage of port 853 would require elevation of privilege, so for in order to use regular user we need to pickup something > 1024.
+Usage of port 853 would require elevation of privilege, so in order to use regular user we need to pickup something > 1024.
+That's why by default app is using port 8853/tcp.
 
 ### TLS connection and privacy profile
 
