@@ -18,7 +18,7 @@ That's why by default app is using port 8853/tcp.
 For fast prototyping purposes we will use opportunistic privacy profile and to not specify CA certificates (use InsecureSkipVerify), 
 but at the same time we have to consider it as one of the key requirements.
 
-Code sample how to do it is commented in a source code, but later on we have to add necessary CA PEM files by specifying them as one or more acrguments.
+Code sample how to do it is commented in a source code, but later on we have to add necessary CA PEM files by specifying them as one or more arguments.
 
 ```golang
         // // TODO: add CA
@@ -36,8 +36,8 @@ Code sample how to do it is commented in a source code, but later on we have to 
 ```
 ### DNS messsages and connection handling
 
-At the first glance we it looks like pipelining of DNS messages from clear text client toward TLS based one, 
-but in order to manage application scalability have to consider parsing the following attributes:
+At the first glance it looks like pipelining of DNS messages from clear text client toward TLS based one, 
+but in order to manage application scalability we have to consider the following DNS message attributes:
 - Two-octet message length
 - Two-octet ID field in DNS message header
 
@@ -56,12 +56,12 @@ type DNSMessage struct {
 ```
 
 To reuse connection toward DNS server and be able to multiplex queries from the several clients, DNSMsgLength and MessageID are used.
-If we design function handling messages toward TLS server as a separate one go routine, we can use channels to send/receive DNSMessage structs to/from client handlers. So finally MessageID can be used to match received message and respond to particular client handler routine, BUT MessageID is unique for the particular client that would cause a collision, so messages could be send back to client which didn't request it and not delivered to the correct one.
-If server part would be multiplexing connections in order to reuse TLS session by mutiple clients, each upsteam DNS request should use MessageID and map respectively to downstream client MessageID and client subroutine/IP@.
+If the function handling messages toward TLS server is designed as a separate go routine, we can use channels to send/receive DNSMessage structs to/from client handlers. So finally MessageID can be used to match received message and respond to particular client handler routine, BUT MessageID is unique for the particular client that would cause a collision between clients, as such messages could be send back to client which didn't request them and not delivered to the correct one.
+If TLS server connection part would be multiplexing client DNS requests in order to reuse TLS session by mutiple clients, each upsteam DNS request should use MessageID and map respectively to downstream client MessageID and client subroutine/IP@.
 Alternatively part of code to manage upstream TLS connection could be implemented as separate micro-service and all requests send/receiveed via gRPC from/to clients.
-The future evolution of the code could be managed potentially in two different ways described above.
+The future evolution of the code could be managed potentially in these two ways described above.
 
-In the provided prototype attributes are extracted to demonstrate the way to manage the subject.
+In the provided prototype attributes are extracted to demonstrate the way to manage the multiplexing.
 
 Client connection handling:
 - Non-blocking other services (implemented by protoype).
@@ -88,13 +88,13 @@ Could be imporved via the following:
 - Preemtive connection closure with subsequent scaling out appliction (instantiation of new PoDs):
   - Less active clients.
   - Bigger RTT.
-- Collect necessary app metrics to orchestrate app and perform scale-in/out.
+- Collect necessary app metrics to orchestrate app and perform scale-in/out on demand.
 
 #### Processing of requests
 
 - Use load-babancers for TCP connections.
 - Refuse conntions (could be use as temporary measure and considered that client application is tolerant enougth).
-- Collect necessary app metrics to orchestrate app and perform scale-in/out.
+- Collect necessary app metrics to orchestrate app and perform scale-in/out on demand.
 
 
 ## Usage of prototype
